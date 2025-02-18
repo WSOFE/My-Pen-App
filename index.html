@@ -1,0 +1,371 @@
+<!-- 
+ 
+# Read Me First  
+
+MIT License
+
+Copyright (c) 2025 World School of Education
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ 
+
+## Dependencies and Their Licenses  
+(Collected from their official GitHub repositories on **February 18, 2025**.)  
+
+### Fabric.js  
+- **License:** MIT  
+- **Copyright:** (c) 2008-2015 Printio (previously Envision LTD)  
+- **Official Website:** [https://fabricjs.com/](https://fabricjs.com/)  
+- **Official GitHub:** [https://github.com/fabricjs/fabric.js](https://github.com/fabricjs/fabric.js)  
+
+### Bootstrap Icons  
+- **License:** MIT  
+- **Copyright:** (c) 2019-2025 The Bootstrap Authors  
+- **Official Website:** [https://icons.getbootstrap.com/](https://icons.getbootstrap.com/)  
+- **Official GitHub:** [https://github.com/twbs/icons](https://github.com/twbs/icons)  
+
+
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+  <title>My Pen App</title>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      
+    }
+    body{
+      background-color: black;
+    }
+    canvas{
+      border: 1px solid gray;
+    }
+    button{
+      width: 40px;
+      height: 40px;
+      border-radius: 20%;
+      background-color: yellow;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <center>
+    <canvas id="canvas" width="1520" height="910"></canvas>
+    
+  </center>
+  <center>
+    <button id="pen"><i class="bi bi-vector-pen"></i></button>
+    <button id="rect"><i class="bi bi-square"></i></button>
+    <button id="line"><i class="bi bi-arrow-right"></i></button>
+    <button id="dashline"><i class="bi bi-three-dots"></i></button>
+    <button id="neu"><i class="bi bi-triangle"></i></button>
+    <button><i class="bi bi-circle"></i></button>
+    <button id="ad"><i class="bi bi-aspect-ratio"></i></button>
+  </center>
+  <img src="1.png" id="img" width="1520" height="920">
+  
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.3/dist/index.js"></script>  
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+  let rect = document.querySelector("#rect");
+  let pen = document.querySelector("#pen");
+  let line = document.querySelector("#line");
+  let dashline = document.querySelector("#dashline");
+  let colP1 = "#FFFF00";
+  let colP2 = "#F11111";
+  let ad = document.querySelector("#ad");
+  let neu = document.querySelector("#neu");
+
+  let canvasEl = document.querySelector("#canvas");
+  let canvas = new fabric.Canvas(canvasEl);
+  canvas.isDrawingMode = false,
+  
+
+  function Lock(obj){
+    obj.set({
+      lockMovementX: true,
+            lockMovementY: true,
+            lockScalingX: true,
+            lockScalingY: true,
+            lockRotation: true,
+            selectable: false, 
+            evented: false
+      });
+  }
+  document.addEventListener("keydown",function(e){
+    let k = e.key;
+    if(k === "D" || k === "d"){
+      let select = canvas.getActiveObject();
+      if(select){
+        canvas.remove(select);
+      }
+    }
+  })
+
+  let X = [];
+  let Y = [];
+  let drawingRect = false;
+  let drawingLine = false;
+
+  function Rect() {
+    canvas.isDrawingMode = false;
+    X = [];
+    Y = [];
+    drawingRect = false;
+  
+    canvas.off('mouse:down');
+    canvas.off('mouse:move');
+    canvas.off('mouse:up');
+  
+    canvas.on('mouse:down', function (event) {
+        X.push(event.pointer.x);
+        Y.push(event.pointer.y);
+        drawingRect = true;
+    });
+  
+    canvas.on('mouse:move', function (event) {
+        if (!drawingRect) return;
+    });
+  
+    canvas.on('mouse:up', function (event) {
+        if (X.length === 0 || Y.length === 0) return;
+  
+        let rect1 = new fabric.Rect({
+            left: X[Y.length-1],  
+            top: Y[X.length-1],   
+            width: event.pointer.x - X[X.length-1],
+            height: event.pointer.y - Y[Y.length-1],
+            stroke: "#FFFF00",
+            strokeWidth: 6,
+            fill: "transparent"
+        });
+  
+        canvas.add(rect1);
+
+        X = [];
+        Y = [];
+        drawingRect = false;
+    });
+  }
+  function Line(){
+  canvas.isDrawingMode = false;
+    LX = [];
+    LY = [];
+    drawingLine = false;
+  
+    canvas.off('mouse:down');
+    canvas.off('mouse:move');
+    canvas.off('mouse:up');
+  
+    canvas.on('mouse:down', function (a) {
+        LX.push(a.pointer.x);
+        LY.push(a.pointer.y);
+        drawingLine = true;
+    });
+  
+    canvas.on('mouse:move', function (a) {
+        if (!drawingLine) return;
+    });
+  
+    canvas.on('mouse:up', function (a) {
+        if (LX.length === 0 || LY.length === 0) return;
+  
+        let line1 = new fabric.Line([LX[LX.length-1],LY[LX.length-1],a.pointer.x,a.pointer.y],{
+          strokeWidth:2.5,stroke:"red",selectable:true
+        });
+  
+        canvas.add(line1);
+        LX = [];
+        LY = [];
+        drawingLine = false;
+    });
+  }
+  function DottedLine(){
+    canvas.isDrawingMode = false;
+      LX = [];
+      LY = [];
+      drawingLine = false;
+    
+      canvas.off('mouse:down');
+      canvas.off('mouse:move');
+      canvas.off('mouse:up');
+    
+      canvas.on('mouse:down', function (a) {
+          LX.push(a.pointer.x);
+          LY.push(a.pointer.y);
+          drawingLine = true;
+      });
+    
+      canvas.on('mouse:move', function (a) {
+          if (!drawingLine) return;
+      });
+    
+      canvas.on('mouse:up', function (a) {
+          if (LX.length === 0 || LY.length === 0) return;
+    
+          let dashline = new fabric.Line([LX[LX.length-1],LY[LX.length-1],a.pointer.x,a.pointer.y],{
+            strokeWidth:2.5,stroke:"red",strokeDashArray:[3,3],selectable:true,
+          });
+    
+          canvas.add(dashline);
+          LX = [];
+          LY = [];
+          drawingLine = false;
+      });
+    }
+
+  pen.addEventListener("click", function () {
+      rect.style.backgroundColor = "#FFFF00";
+      neu.style.backgroundColor = "#FFFF00";
+      dashline.style.backgroundColor = colP1;
+      line.style.backgroundColor = "#FFFF00"
+      pen.style.backgroundColor = "#F11111";
+
+      canvas.off('mouse:down');
+      canvas.off('mouse:move');
+      canvas.off('mouse:up');
+
+      canvas.isDrawingMode = true; // Enable drawing mode
+      canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+      canvas.freeDrawingBrush.width = 3;
+      canvas.freeDrawingBrush.color = "#F5D924"
+  });
+
+  rect.addEventListener("click", function () {
+      pen.style.backgroundColor = "#FFFF00";
+      dashline.style.backgroundColor = colP1;
+      neu.style.backgroundColor = "#FFFF00";
+      line.style.backgroundColor = "#FFFF00"
+      rect.style.backgroundColor = "#F11111";
+
+      Rect();
+  });
+  line.addEventListener("click",function(){
+      neu.style.backgroundColor = colP1;
+      dashline.style.backgroundColor = colP1;
+      pen.style.backgroundColor = colP1;
+      line.style.backgroundColor = "#F11111"
+      rect.style.backgroundColor = colP1;
+      Line();
+  });
+
+  dashline.addEventListener("click",function(){
+    neu.style.backgroundColor = colP1
+    dashline.style.backgroundColor = colP2
+    pen.style.backgroundColor = colP1
+    line.style.backgroundColor = colP1
+    rect.style.backgroundColor = colP1
+    
+    DottedLine();
+});
+  
+
+  neu.addEventListener("click", function () {
+      neu.style.backgroundColor = "#F11111";
+      dashline.style.backgroundColor = colP1
+      pen.style.backgroundColor = "#FFFF00";
+      line.style.backgroundColor = "#FFFF00"
+      rect.style.backgroundColor = "#FFFF00";
+
+
+      canvas.isDrawingMode = false;
+      canvas.off('mouse:down');
+      canvas.off('mouse:move');
+      canvas.off('mouse:up');
+  });
+  ad.addEventListener("click",function(){
+    ad.style.backgroundColor = "#fd12bc";
+
+  
+  let reP = new fabric.Rect({
+            left:0,  
+            top:0,   
+            width:canvas.width,
+            height: canvas.height,
+            stroke: "#000000",
+            strokeWidth: 6,
+            fill: "#000000"
+        });
+        reP.set({
+        lockMovementX: true,
+        lockMovementY: true,
+        lockScalingX: true,
+        lockScalingY: true,
+        lockRotation: true,
+        selectable: false, 
+        evented: false
+
+        });
+        canvas.add(reP);
+
+
+
+var imgElement = document.getElementById("img");
+
+
+var imgInstance = new fabric.Image(imgElement, {
+  left:0,
+  top:0,
+  angle:0,
+  opacity:1,
+  scaleX:canvas.width/imgElement.width,
+  scaleY:canvas.height/imgElement.height
+
+});
+imgInstance.set({
+  lockMovementX: true,
+  lockMovementY: true,
+  lockScalingX: true,
+  lockScalingY: true,
+  lockRotation: true,
+  selectable: false, 
+  evented: false
+
+  });
+  document.body.removeChild(imgElement)
+
+
+canvas.add(imgInstance);
+
+  
+  
+    
+  });
+
+
+
+
+
+});
+
+</script>
+
+</body>
+</html>
